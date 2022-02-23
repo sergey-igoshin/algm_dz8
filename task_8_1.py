@@ -1,23 +1,8 @@
-"""
-Задание 1.
-
-Реализуйте кодирование строки по алгоритму Хаффмана.
-У вас два пути:
-1) тема идет тяжело? тогда вы можете, опираясь на примеры с урока,
- сделать свою версию алгоритма
-Разрешается и приветствуется изменение имен переменных,
-выбор других коллекций, различные изменения
-и оптимизации.
-
-2) тема понятна? постарайтесь сделать свою реализацию.
-Вы можете реализовать задачу, например,
-через ООП или предложить иной подход к решению.
-"""
 import heapq
 from collections import Counter
 
 
-class HuffmanCode:
+class HuffmanCoding:
     def __init__(self, user_string=None):
         self.user_string = user_string
         self.heap = []
@@ -34,11 +19,6 @@ class HuffmanCode:
         def __lt__(self, other):
             return self.freq < other.freq
 
-    def make_heap(self, frequency):
-        for key in frequency:
-            node = self.HeapNode(key, frequency[key])
-            heapq.heappush(self.heap, node)
-
     def merge_nodes(self):
         if len(self.heap) == 1:
             return
@@ -50,10 +30,7 @@ class HuffmanCode:
         heapq.heappush(self.heap, merged)
         return self.merge_nodes()
 
-    def make_codes(self, root=None, path=None):
-        if root is None and path is None:
-            root, path = heapq.heappop(self.heap), ''
-
+    def make_codes(self, root, path=''):
         if root is None:
             return
 
@@ -65,17 +42,15 @@ class HuffmanCode:
         self.make_codes(root.left, path=f'{path}0')
         self.make_codes(root.right, path=f'{path}1')
 
-    def get_encoded_text(self, text):
-        encoded_text = ""
-        for character in text:
-            encoded_text += self.codes[character]
-        return encoded_text
-
     def encode(self):
-        self.make_heap(Counter(self.user_string))
+        frequency = Counter(self.user_string)
+        for key in frequency:
+            heapq.heappush(self.heap, self.HeapNode(key, frequency[key]))
         self.merge_nodes()
-        self.make_codes()
-        encoded_text = self.get_encoded_text(self.user_string)
+        self.make_codes(heapq.heappop(self.heap))
+        encoded_text = ''
+        for character in self.user_string:
+            encoded_text += self.codes[character]
         return encoded_text
 
     def decode(self, encoded_text, count=1, decoded_text=""):
@@ -90,7 +65,7 @@ class HuffmanCode:
 
 if __name__ == '__main__':
     string = input('Введите строку: ')
-    h = HuffmanCode(string)
+    h = HuffmanCoding(string)
 
     encode_text = h.encode()
     print(f'Строка кода после кодирования:', encode_text, sep='\n')
